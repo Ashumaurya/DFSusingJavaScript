@@ -38,12 +38,32 @@ function drawCell() {
     grid[i].show();
   }
 
+  grid[0].wall[0] = false;
+  grid[0].wall[1] = false;
+  grid[0].wall[2] = false;
+  grid[0].wall[3] = false;
+  RedrawCell();
+
   current.visited = true;
   createRect(current);
   nextCell(current);
 
   // var next = current.checkNeighbours()[0];
   // var length = current.checkNeighbours()[1].length;
+}
+function RedrawCell() {
+  //console.log(grid[0]);
+  console.log("redraw");
+  ctx.clearRect(0, 0, 400, 400);
+  // RedrawLines(grid[0]);
+  for (let i = 0; i < grid.length; i++) {
+    grid[i].show();
+  }
+}
+function removeWalls(a, b) {
+  var x = a.i - b.i;
+  if (x == 1) {
+  }
 }
 
 function nextCell(current) {
@@ -112,7 +132,6 @@ function Cell(i, j) {
       var min = Math.ceil(0);
       var max = Math.floor(this.neighbour.length);
       var random = Math.floor(Math.random() * (max - min) + min);
-
       return this.neighbour[random];
     } else {
       return undefined;
@@ -121,6 +140,10 @@ function Cell(i, j) {
   this.show = function () {
     var x = this.i * w;
     var y = this.j * w;
+
+    let canvas = document.getElementById("app");
+    var ctx = canvas.getContext("2d");
+    ctx.beginPath();
 
     // top line
     function MakeLine(from_x, from_y, to_x, to_y) {
@@ -133,17 +156,20 @@ function Cell(i, j) {
     }
     if (this.wall[0]) {
       let top = new MakeLine(x, y, x + w, y);
+      ctx.stroke();
     }
     if (this.wall[1]) {
       let right = new MakeLine(x + w, y, x + w, y + w);
+      ctx.stroke();
     }
     if (this.wall[2]) {
       let bottom = new MakeLine(x, y + w, x + w, y + w);
+      ctx.stroke();
     }
     if (this.wall[3]) {
       let left = new MakeLine(x, y, x, y + w);
+      ctx.stroke();
     }
-
     // //top line
     //   ctx.moveTo(x, y);
     //   ctx.lineTo(x+w, y);
@@ -159,8 +185,6 @@ function Cell(i, j) {
 
     //     ctx.moveTo(x+w,y);
     //     ctx.lineTo(x+w,y+w)
-
-    ctx.stroke();
   };
 }
 
