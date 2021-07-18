@@ -2,13 +2,11 @@ import "./styles.css";
 var col, row;
 var w = 20;
 let grid = [];
+let stack = [];
 let current;
 let canvas = document.getElementById("app");
 var ctx = canvas.getContext("2d");
 ctx.beginPath();
-
-let array = [0, 1, 3, 4];
-console.log(array.length);
 
 function Maxcanvas(width, height) {
   col = Math.floor(width / w);
@@ -20,7 +18,7 @@ function Maxcanvas(width, height) {
       grid.push(cell);
     }
   }
-  current = grid[index(10, 10)];
+  current = grid[0];
 
   createCanvas(width, height);
   drawCell();
@@ -38,10 +36,6 @@ function drawCell() {
     grid[i].show();
   }
 
-  grid[0].wall[0] = false;
-  grid[0].wall[1] = false;
-  grid[0].wall[2] = false;
-  grid[0].wall[3] = false;
   RedrawCell();
 
   current.visited = true;
@@ -62,22 +56,46 @@ function RedrawCell() {
 }
 function removeWalls(a, b) {
   var x = a.i - b.i;
-  if (x == 1) {
+  if (x === 1) {
+    a.wall[3] = false;
+    b.wall[1] = false;
+    RedrawCell();
+  } else if (x === -1) {
+    a.wall[1] = false;
+    b.wall[3] = false;
+    RedrawCell();
+  }
+
+  var y = a.j - b.j;
+  if (y === 1) {
+    a.wall[0] = false;
+    b.wall[2] = false;
+    RedrawCell();
+  } else if (y === -1) {
+    a.wall[2] = false;
+    b.wall[0] = false;
+    RedrawCell();
   }
 }
 
 function nextCell(current) {
+  console.log(current);
   setTimeout(() => {
     var next = current.checkNeighbours();
-
+    console.log(next);
     if (next) {
       next.visited = true;
-      createRect(next);
+      removeWalls(current, next);
+      createRect(current);
+
       current = next;
+      stack.push(next);
 
       nextCell(current);
+    } else {
+      nextCell(stack.pop());
     }
-  }, 1000 / 5);
+  }, 1000 / 1000);
 
   // nextCell(current);
 }
@@ -87,12 +105,16 @@ function index(i, j) {
   } else return j + i * col;
 }
 function createRect(current) {
+  let canvas = document.getElementById("app");
+  var ctx = canvas.getContext("2d");
+  ctx.beginPath();
   var x = current.i * w;
   var y = current.j * w;
   if (current.visited) {
     ctx.rect(x, y, w, w);
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     ctx.fill();
+    current.show();
   }
 }
 
